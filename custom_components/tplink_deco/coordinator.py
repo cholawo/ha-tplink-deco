@@ -77,11 +77,6 @@ def coerce_float(value):
         return None
 
 
-def bytes_to_bits(bytes_count):
-    numeric_value = coerce_float(bytes_count)
-    return numeric_value / 8 if numeric_value is not None else None
-
-
 def filter_invalid_ip(ip_address):
     try:
         # Check that it parsed to an IP address
@@ -197,8 +192,9 @@ class TpLinkDecoClient:
         self.online = data.get("online")
         self.connection_type = data.get("connection_type")
         self.interface = data.get("interface")
-        self.down_kilobytes_per_s = bytes_to_bits(data.get("down_speed", 0))
-        self.up_kilobytes_per_s = bytes_to_bits(data.get("up_speed", 0))
+        # Deco client_list up_speed/down_speed are already kilobytes per second.
+        self.down_kilobytes_per_s = coerce_float(data.get("down_speed")) or 0.0
+        self.up_kilobytes_per_s = coerce_float(data.get("up_speed")) or 0.0
         self.last_activity = utc_point_in_time
 
 
